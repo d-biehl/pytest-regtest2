@@ -21,6 +21,7 @@ To install and activate this plugin execute:
 *pytest-regtest* plugin provides a fixture named *regtest* which can be
 used as a file handle for recording data:
 
+```python
     from __future__ import print_function
 
     def test_squares_up_to_ten(regtest):
@@ -36,6 +37,8 @@ used as a file handle for recording data:
         # or using a context manager:
         with regtest:
             print("this will be recorded")
+```
+
 
 If you run this test script with *pytest* the first time there is no
 recorded output for this test function so far and thus the test will
@@ -68,6 +71,7 @@ Now the next execution of *py.test* will succeed:
 Now we break the test by modifying the code under test to compute the first
 eleven square numbers:
 
+```python
     from __future__ import print_function
 
     def test_squares_up_to_ten(regtest):
@@ -79,6 +83,8 @@ eleven square numbers:
 
         # alternative method to record output:
         regtest.write("done")
+```
+
 
 The next run of pytest delivers a nice diff of the current and expected output
 from this test function:
@@ -104,12 +110,14 @@ Other features
 
 Another way to record output is the *regtest\_redirect* fixture:
 
+```python
     def test_squares_up_to_ten(regtest_redirect):
 
         result = [i*i for i in range(10)]
 
         with regtest_redirect():
-            print result
+            print(result)
+```
 
 You can reset recorded output of files and functions individually as:
 
@@ -142,6 +150,7 @@ The plugin already replaces such changing data in the recorded output,
 and one can register own converters in `conftest.py` in the tests
 folder. For example:
 
+```python
     import pytest_regtest
 
     @pytest_regtest.register_converter_pre
@@ -161,6 +170,8 @@ folder. For example:
 
         # for demo only
         return txt.upper()
+```
+
 
 This can be used to fix substrings like "computation need 1.23 seconds"
 to "computation needed <TIME> seconds" etc.
