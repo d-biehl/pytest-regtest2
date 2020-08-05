@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup
 
-VERSION = (1, 4, 0)   # no need to adapt version in other locations
+VERSION = (1, 4, 4)  # no need to adapt version in other locations
 
 AUTHOR = "Uwe Schmitt"
 AUTHOR_EMAIL = "uwe.schmitt@id.ethz.ch"
@@ -20,20 +20,8 @@ LONG_DESCRIPTION = ""
 
 if len(sys.argv) > 1 and "dist" in sys.argv[1] and "wheel" not in sys.argv[1]:
 
-    assert sys.version_info.major == 3, "please use python 3 to build package"
-    from subprocess import check_output
-
-    here = os.path.dirname(os.path.abspath(__file__))
-    try:
-        rst_content = check_output(
-            "pandoc {} -t rst".format(os.path.join(here, "README.md")), shell=True
-        )
-
-        LONG_DESCRIPTION = str(rst_content, encoding="ascii")
-
-    except:
-        pass
-
+    HERE = os.path.dirname(os.path.abspath(__file__))
+    LONG_DESCRIPTION = open(os.path.join(HERE, "README.md")).read()
 
 if __name__ == "__main__":
 
@@ -47,7 +35,9 @@ if __name__ == "__main__":
         license=LICENSE,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        long_description_content_type="text/markdown",
         # the following makes a plugin available to pytest
         entry_points={"pytest11": ["regtest = pytest_regtest"]},
         install_requires=["pytest>=4.1.0"],
+        include_package_data=True,
     )

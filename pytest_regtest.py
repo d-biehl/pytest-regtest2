@@ -13,6 +13,7 @@ import py
 import pytest
 from _pytest._code.code import ExceptionInfo, TerminalRepr
 from _pytest.outcomes import skip
+from hashlib import sha512
 
 pytest_plugins = ["pytester"]
 
@@ -66,18 +67,26 @@ def register_converter_post(function):
 def _std_replacements(request):
 
     if "tmpdir" in request.fixturenames:
+        tmpdir = request.getfixturevalue("tmpdir").strpath + os.path.sep
+        yield tmpdir, "<tmpdir_from_fixture>/"
         tmpdir = request.getfixturevalue("tmpdir").strpath
         yield tmpdir, "<tmpdir_from_fixture>"
 
     regexp = os.path.join(tempfile.gettempdir(), "tmp[_a-zA-Z0-9]+")
 
     yield regexp, "<tmpdir_from_tempfile_module>"
-    yield os.path.realpath(tempfile.gettempdir()), "<tmpdir_from_tempfile_module>"
+    yield os.path.realpath(
+        tempfile.gettempdir()
+    ) + os.path.sep, "<tmpdir_from_tempfile_module>/"
+    yield os.path.realpath(
+        tempfile.gettempdir()
+    ), "<tmpdir_from_tempfile_module>"
+    yield tempfile.tempdir + os.path.sep, "<tmpdir_from_tempfile_module>/"
     yield tempfile.tempdir, "<tmpdir_from_tempfile_module>"
     yield r"var/folders/.*/pytest-of.*/", "<pytest_tempdir>/"
 
     # replace hex object ids in output by 0x?????????
-    yield r" 0x[0-9a-f]+", " 0x?????????"
+    yield r" 0x[0-9a-fA-F]+", " 0x?????????"
 
 
 def _std_conversion(recorded, request):
@@ -193,6 +202,11 @@ class RegTestFixture(object):
         file_name, __, test_function = self.nodeid.partition("::")
         file_name = os.path.basename(file_name)
         test_function = test_function.replace("/", "--")
+
+        # If file name is too long, hash parameters.
+        if len(test_function) > 100:
+            test_function = sha512(test_function.encode('utf-8')).hexdigest()[:10]
+
         stem, __ = os.path.splitext(file_name)
         if self.identifier is not None:
             return stem + "." + test_function + "__" + self.identifier + ".out"
@@ -235,8 +249,6 @@ class RegTestFixture(object):
         return False  # don't suppress exception
 
 
-
-
 @pytest.fixture
 def regtest(request):
     item = request.node
@@ -246,6 +258,10 @@ def regtest(request):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
+
+    if "regtest" not in item.fixturenames:
+        yield
+        return
 
     outcome = yield
 
