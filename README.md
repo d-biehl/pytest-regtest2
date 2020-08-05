@@ -115,7 +115,7 @@ Another way to record output is to capture all output to `sys.stdout`:
 
         result = [i*i for i in range(10)]
 
-        with regtest_redirect():
+        with regtest():
             print(result)
 ```
 
