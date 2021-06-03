@@ -21,8 +21,6 @@ To install and activate this plugin execute:
 *pytest-regtest* plugin provides a fixture named *regtest* which can be
 used as a file handle for recording data:
 
-    from __future__ import print_function
-
     def test_squares_up_to_ten(regtest):
 
         result = [i*i for i in range(10)]
@@ -109,7 +107,7 @@ Another way to record output is to capture all output to `sys.stdout`:
         result = [i*i for i in range(10)]
 
         with regtest():
-            print result
+            print(result)
 
 You can reset recorded output of files and functions individually as:
 
