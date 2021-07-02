@@ -236,6 +236,10 @@ class RegTestFixture(object):
     def current(self):
         return cleanup(self.buffer.getvalue(), self.request)
 
+    @property
+    def current_raw(self):
+        return self.buffer.getvalue()
+
     def write_current(self):
         folder = os.path.dirname(self.result_file)
         if not os.path.exists(folder):
@@ -314,10 +318,10 @@ def handle_regtest_result(regtest, result, xfail):
 
     if Config.tee:
         tw.line()
-        line = "recorded output to regtest fixture:"
+        line = "recorded raw output to regtest fixture:"
         line = ljust(line, tw.fullwidth, "-")
         tw.line(line, green=True)
-        tw.write(regtest.current, cyan=True)
+        tw.write(regtest.current_raw, cyan=True)
         tw.line("-" * tw.fullwidth, green=True)
 
     if not Config.reset:
