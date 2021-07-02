@@ -226,7 +226,8 @@ class RegTestFixture(object):
     @property
     def tobe(self):
         if os.path.exists(self.result_file):
-            return open(self.result_file).read()
+            with open(self.result_file) as f:
+                return f.read()
         return ""
 
     @property
