@@ -22,7 +22,6 @@ To install and activate this plugin execute:
 used as a file handle for recording data:
 
 ```python
-    from __future__ import print_function
 
     def test_squares_up_to_ten(regtest):
 
@@ -118,6 +117,7 @@ Another way to record output is to capture all output to `sys.stdout`:
         with regtest():
             print(result)
 ```
+
 
 You can reset recorded output of files and functions individually as:
 

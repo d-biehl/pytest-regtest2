@@ -43,7 +43,7 @@ else:
 http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
 """
 
-textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7f})
+textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
 
 
 def is_binary_string(bytes):
@@ -72,15 +72,18 @@ def _std_replacements(request):
         tmpdir = request.getfixturevalue("tmpdir").strpath
         yield tmpdir, "<tmpdir_from_fixture>"
 
+    regexp = os.path.join(
+        os.path.realpath(tempfile.gettempdir()), "pytest-of-.*", "pytest-\d+/"
+    )
+    yield regexp, "<pytest_tempdir>/"
+
     regexp = os.path.join(tempfile.gettempdir(), "tmp[_a-zA-Z0-9]+")
 
     yield regexp, "<tmpdir_from_tempfile_module>"
     yield os.path.realpath(
         tempfile.gettempdir()
     ) + os.path.sep, "<tmpdir_from_tempfile_module>/"
-    yield os.path.realpath(
-        tempfile.gettempdir()
-    ), "<tmpdir_from_tempfile_module>"
+    yield os.path.realpath(tempfile.gettempdir()), "<tmpdir_from_tempfile_module>"
     yield tempfile.tempdir + os.path.sep, "<tmpdir_from_tempfile_module>/"
     yield tempfile.tempdir, "<tmpdir_from_tempfile_module>"
     yield r"var/folders/.*/pytest-of.*/", "<pytest_tempdir>/"
@@ -205,7 +208,7 @@ class RegTestFixture(object):
 
         # If file name is too long, hash parameters.
         if len(test_function) > 100:
-            test_function = sha512(test_function.encode('utf-8')).hexdigest()[:10]
+            test_function = sha512(test_function.encode("utf-8")).hexdigest()[:10]
 
         stem, __ = os.path.splitext(file_name)
         if self.identifier is not None:
@@ -232,6 +235,10 @@ class RegTestFixture(object):
     @property
     def current(self):
         return cleanup(self.buffer.getvalue(), self.request)
+
+    @property
+    def current_raw(self):
+        return self.buffer.getvalue()
 
     def write_current(self):
         folder = os.path.dirname(self.result_file)
@@ -311,10 +318,10 @@ def handle_regtest_result(regtest, result, xfail):
 
     if Config.tee:
         tw.line()
-        line = "recorded output to regtest fixture:"
+        line = "recorded raw output to regtest fixture:"
         line = ljust(line, tw.fullwidth, "-")
         tw.line(line, green=True)
-        tw.write(regtest.current, cyan=True)
+        tw.write(regtest.current_raw, cyan=True)
         tw.line("-" * tw.fullwidth, green=True)
 
     if not Config.reset:
