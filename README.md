@@ -22,7 +22,6 @@ To install and activate this plugin execute:
 used as a file handle for recording data:
 
 ```python
-
     def test_squares_up_to_ten(regtest):
 
         result = [i*i for i in range(10)]
@@ -37,7 +36,6 @@ used as a file handle for recording data:
         with regtest:
             print("this will be recorded")
 ```
-
 
 If you run this test script with *pytest* the first time there is no
 recorded output for this test function so far and thus the test will
@@ -84,7 +82,6 @@ eleven square numbers:
         regtest.write("done")
 ```
 
-
 The next run of pytest delivers a nice diff of the current and expected output
 from this test function:
 
@@ -117,7 +114,6 @@ Another way to record output is to capture all output to `sys.stdout`:
         with regtest():
             print(result)
 ```
-
 
 You can reset recorded output of files and functions individually as:
 
@@ -171,7 +167,6 @@ folder. For example:
         # for demo only
         return txt.upper()
 ```
-
 
 This can be used to fix substrings like "computation need 1.23 seconds"
 to "computation needed <TIME> seconds" etc.
