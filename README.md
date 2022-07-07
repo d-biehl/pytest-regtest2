@@ -106,7 +106,7 @@ Another way to record output is to capture all output to `sys.stdout`:
 
         result = [i*i for i in range(10)]
 
-        with regtest():
+        with regtest:
             print(result)
 
 You can reset recorded output of files and functions individually as:
