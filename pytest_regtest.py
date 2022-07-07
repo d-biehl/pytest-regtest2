@@ -266,7 +266,7 @@ def regtest(request):
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
 
-    if "regtest" not in item.fixturenames:
+    if not hasattr(item, "fixturenames") or "regtest" not in item.fixturenames:
         yield
         return
 
