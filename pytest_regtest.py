@@ -33,7 +33,6 @@ if IS_PY3:
     def ljust(s, *a):
         return s.ljust(*a)
 
-
 else:
     from cStringIO import StringIO
     from string import ljust
@@ -201,12 +200,11 @@ class RegTestFixture(object):
         self.identifier = None
 
     @property
-    def output_file_name(self):
+    def old_output_file_name(self):
         file_name, __, test_function = self.nodeid.partition("::")
         file_name = os.path.basename(file_name)
-        test_function = test_function.replace("/", "--")
 
-        # If file name is too long, hash parameters.
+        test_function = test_function.replace("/", "--")
         if len(test_function) > 100:
             test_function = sha512(test_function.encode("utf-8")).hexdigest()[:10]
 
@@ -215,6 +213,35 @@ class RegTestFixture(object):
             return stem + "." + test_function + "__" + self.identifier + ".out"
         else:
             return stem + "." + test_function + ".out"
+
+    @property
+    def output_file_name(self):
+        file_name, __, test_function = self.nodeid.partition("::")
+        file_name = os.path.basename(file_name)
+
+        for c in "/\\:*\"'?<>|":
+            test_function = test_function.replace(c, "-")
+
+        # If file name is too long, hash parameters.
+        if len(test_function) > 100:
+            test_function = (
+                test_function[:88]
+                + "__"
+                + sha512(test_function.encode("utf-8")).hexdigest()[:10]
+            )
+
+        test_function = test_function.replace(" ", "_")
+        stem, __ = os.path.splitext(file_name)
+        if self.identifier is not None:
+            return stem + "." + test_function + "__" + self.identifier + ".out"
+        else:
+            return stem + "." + test_function + ".out"
+
+    @property
+    def old_result_file(self):
+        return os.path.join(
+            self.test_folder, "_regtest_outputs", self.old_output_file_name
+        )
 
     @property
     def result_file(self):
@@ -231,6 +258,10 @@ class RegTestFixture(object):
         if os.path.exists(self.result_file):
             with open(self.result_file) as f:
                 return f.read()
+        if os.path.exists(self.old_result_file):
+            with open(self.old_result_file) as f:
+                return f.read()
+
         return ""
 
     @property
@@ -245,6 +276,11 @@ class RegTestFixture(object):
         folder = os.path.dirname(self.result_file)
         if not os.path.exists(folder):
             os.makedirs(folder)
+        if os.path.exists(self.old_result_file):
+            with open(self.old_result_file, "w") as fh:
+                fh.write(self.current)
+            return
+
         with open(self.result_file, "w") as fh:
             fh.write(self.current)
 
