@@ -5,7 +5,7 @@ import sys
 
 from setuptools import setup
 
-VERSION = (1, 4, 6)  # no need to adapt version in other locations
+VERSION = (1, 4, 7)  # no need to adapt version in other locations
 
 AUTHOR = "Uwe Schmitt"
 AUTHOR_EMAIL = "uwe.schmitt@id.ethz.ch"
