@@ -229,7 +229,8 @@ class RegTestFixture(object):
     @property
     def tobe(self):
         if os.path.exists(self.result_file):
-            return open(self.result_file).read()
+            with open(self.result_file) as f:
+                return f.read()
         return ""
 
     @property
@@ -266,7 +267,7 @@ def regtest(request):
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
 
-    if "regtest" not in item.fixturenames:
+    if not hasattr(item, "fixturenames") or "regtest" not in item.fixturenames:
         yield
         return
 
