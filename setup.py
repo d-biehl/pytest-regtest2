@@ -38,6 +38,6 @@ if __name__ == "__main__":
         long_description_content_type="text/markdown",
         # the following makes a plugin available to pytest
         entry_points={"pytest11": ["regtest = pytest_regtest"]},
-        install_requires=["pytest>=4.1.0"],
+        install_requires=["pytest<7.2.0"],
         include_package_data=True,
     )
