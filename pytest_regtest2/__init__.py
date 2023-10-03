@@ -1,6 +1,3 @@
-# encoding: utf-8
-from __future__ import absolute_import, division, print_function
-
 import difflib
 import functools
 import os
@@ -8,45 +5,21 @@ import re
 import sys
 import tempfile
 
-import pkg_resources
-import py
+
 import pytest
 from _pytest._code.code import ExceptionInfo, TerminalRepr
 from _pytest.outcomes import skip
+from _pytest._io.terminalwriter import TerminalWriter
 from hashlib import sha512
+from io import StringIO
 
 pytest_plugins = ["pytester"]
 
 
-_version = pkg_resources.require("pytest-regtest")[0].version.split(".")
-__version__ = tuple(map(int, _version))
-del _version
-
-
-IS_PY3 = sys.version_info.major == 3
 IS_WIN = sys.platform == "win32"
 
-if IS_PY3:
-    open = functools.partial(open, encoding="utf-8")
-    from io import StringIO
 
-    def ljust(s, *a):
-        return s.ljust(*a)
-
-else:
-    from cStringIO import StringIO
-    from string import ljust
-
-
-""" the function below is from
-http://stackoverflow.com/questions/898669/how-can-i-detect-if-a-file-is-binary-non-text-in-python
-"""
-
-textchars = bytearray({7, 8, 9, 10, 12, 13, 27} | set(range(0x20, 0x100)) - {0x7F})
-
-
-def is_binary_string(bytes):
-    return bool(bytes.translate(None, textchars))
+open = functools.partial(open, encoding="utf-8")
 
 
 _converters_pre = []
@@ -64,7 +37,6 @@ def register_converter_post(function):
 
 
 def _std_replacements(request):
-
     if "tmpdir" in request.fixturenames:
         tmpdir = request.getfixturevalue("tmpdir").strpath + os.path.sep
         yield tmpdir, "<tmpdir_from_fixture>/"
@@ -92,7 +64,6 @@ def _std_replacements(request):
 
 
 def _std_conversion(recorded, request):
-
     fixed = []
     for line in recorded.split("\n"):
         for regex, replacement in _std_replacements(request):
@@ -116,7 +87,6 @@ def _call_converter(converter, recorded, request):
 
 
 def cleanup(recorded, request):
-
     for converter in _converters_pre:
         recorded = _call_converter(converter, recorded, request)
 
@@ -124,12 +94,6 @@ def cleanup(recorded, request):
 
     for converter in _converters_post:
         recorded = _call_converter(converter, recorded, request)
-
-    # in python 3 a string should not contain binary symbols...:
-    if not IS_PY3 and is_binary_string(recorded):
-        request.raiseerror(
-            "recorded output for regression test contains unprintable characters."
-        )
 
     return recorded
 
@@ -173,7 +137,6 @@ def pytest_addoption(parser):
 
 
 class Config:
-
     ignore_line_endings = True
     tee = False
     reset = False
@@ -185,9 +148,6 @@ def pytest_configure(config):
     Config.ignore_line_endings = not config.getvalue("--regtest-regard-line-endings")
     Config.reset = config.getvalue("--regtest-reset")
     Config.nodiff = config.getvalue("--regtest-nodiff")
-
-
-tw = py.io.TerminalWriter()
 
 
 class RegTestFixture(object):
@@ -302,7 +262,6 @@ def regtest(request):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-
     if not hasattr(item, "fixturenames") or "regtest" not in item.fixturenames:
         yield
         return
@@ -352,17 +311,17 @@ def pytest_runtest_makereport(item, call):
 
 
 def handle_regtest_result(regtest, result, xfail):
-
     if Config.tee:
+        tw = TerminalWriter()
+
         tw.line()
         line = "recorded raw output to regtest fixture:"
-        line = ljust(line, tw.fullwidth, "-")
+        line = line.ljust(tw.fullwidth, "-")
         tw.line(line, green=True)
         tw.write(regtest.current_raw, cyan=True)
         tw.line("-" * tw.fullwidth, green=True)
 
     if not Config.reset:
-
         current = regtest.current.split("\n")
         tobe = regtest.tobe.split("\n")
 
@@ -371,7 +330,6 @@ def handle_regtest_result(regtest, result, xfail):
             tobe = [l.rstrip() for l in tobe]
 
         if current != tobe:
-
             if xfail:
                 result.outcome = "skipped"
             else:

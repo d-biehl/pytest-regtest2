@@ -1,17 +1,13 @@
-# encoding: utf-8
-from __future__ import absolute_import, division, print_function
-
 import sys
+
+from pytest import Testdir
 
 IS_WIN = sys.platform == "win32"
 
 
-def test_fixture(testdir):
-
+def test_fixture(testdir: Testdir):
     testdir.makepyfile(
         """
-        from __future__ import print_function
-
         import os
         import tempfile
         import time
@@ -69,7 +65,7 @@ def test_fixture(testdir):
         ]
     )
 
-    print(result.stdout.str())
+    # print(result.stdout.str())
 
     expected_diff = """
                     >   --- current
@@ -84,7 +80,7 @@ def test_fixture(testdir):
         "\n"
     )
 
-    result.stdout.fnmatch_lines([l.lstrip() for l in expected_diff])
+    result.stdout.fnmatch_lines([line.lstrip() for line in expected_diff])
     result.stdout.fnmatch_lines(["*5 failed, 2 passed, 2 xfailed*"])
 
     # reset
@@ -99,18 +95,12 @@ def test_fixture(testdir):
         path = output_root.join("test_fixture.{}.out".format(fname))
         return open(path.strpath).read()
 
-    sep = "\\" if IS_WIN else "/"
-
-    assert (
-        _read_output("test_regtest")
-        == (
-            "THIS IS EXPECTED OUTCOME\n"
-            "<TMPDIR_FROM_FIXTURE>%sTEST\n"
-            "<TMPDIR_FROM_TEMPFILE_MODULE>\n"
-            "<TMPDIR_FROM_TEMPFILE_MODULE>\n"
-            "OBJ ID IS 0X?????????\n"
-        )
-        % sep
+    assert _read_output("test_regtest") == (
+        "THIS IS EXPECTED OUTCOME\n"
+        "<TMPDIR_FROM_FIXTURE>/TEST\n"
+        "<TMPDIR_FROM_TEMPFILE_MODULE>\n"
+        "<TMPDIR_FROM_TEMPFILE_MODULE>\n"
+        "OBJ ID IS 0X?????????\n"
     )
 
     reg_test_files = [f.basename for f in output_root.listdir()]

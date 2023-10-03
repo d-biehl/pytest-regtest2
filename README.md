@@ -1,7 +1,15 @@
-pytest-regtest
-==============
+# pytest-regtest2
 
-pytest-regtest is a *pytest*-plugin for implementing regression tests.
+*pytest-regtest2* is a fork of [pytest-regtest][pytest-regtest], a plugin for [pytest][pytest]. I forked this project to make it compatible with the latest versions of Python and pytest.
+
+The main changes in this fork are:
+
+- Support for **Python 3.12** (minimum 3.8)
+- Update to **pytest 7.4.0** and higher
+- Removal of **Python 2** support
+
+
+*pytest-regtest2* is a *pytest*-plugin for implementing regression tests.
 Compared to functional testing a regression test does not test if
 software produces correct results, instead a regression test checks if
 software behaves the same way as it did before introduced changes.
@@ -11,14 +19,14 @@ More about regression testing at
 is a common technique to get started when refactoring legacy code
 lacking a test suite.
 
-*pytest-regtest* allows capturing selected output which then can be
+*pytest-regtest2* allows capturing selected output which then can be
 compared to the captured output from former runs.
 
 To install and activate this plugin execute:
 
-    $ pip install pytest-regtest
+    $ pip install pytest-regtest2
 
-*pytest-regtest* plugin provides a fixture named *regtest* which can be
+*pytest-regtest2* plugin provides a fixture named *regtest* which can be
 used as a file handle for recording data:
 
 ```python
@@ -147,9 +155,9 @@ and one can register own converters in `conftest.py` in the tests
 folder. For example:
 
 ```python
-    import pytest_regtest
+    import pytest_regtest2
 
-    @pytest_regtest.register_converter_pre
+    @pytest_regtest2.register_converter_pre
     def fix_before(txt):
         """modify recorded output before the default fixes
         like temp folders or hex object ids are applied"""
@@ -159,7 +167,7 @@ folder. For example:
         lines = [l for l in lines if "password is" not in l]
         return '\n'.join(lines)
 
-    @pytest_regtest.register_converter_post
+    @pytest_regtest2.register_converter_post
     def after(txt):
         """modify recorded output after the default fixes
         like temp folders or hex object ids are applied"""
@@ -173,3 +181,7 @@ to "computation needed <TIME> seconds" etc.
 
 One can register multiple such converters which will be applied in
 order of registration.
+
+
+[pytest]: https://pytest.org/
+[pytest-regtest]: https://gitlab.com/uweschmitt/pytest-regtest

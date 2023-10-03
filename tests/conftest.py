@@ -1,9 +1,4 @@
-#! /usr/bin/env python
-# encoding: utf-8
-from __future__ import print_function, division, absolute_import
-
-
-from pytest_regtest import register_converter_pre, register_converter_post
+from pytest_regtest2 import register_converter_pre, register_converter_post
 
 
 @register_converter_pre
