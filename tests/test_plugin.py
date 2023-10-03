@@ -84,7 +84,7 @@ def test_fixture(testdir: Testdir):
     result.stdout.fnmatch_lines(["*5 failed, 2 passed, 2 xfailed*"])
 
     # reset
-    result = testdir.runpytest("--regtest-reset", "-v")
+    result = testdir.runpytest("--regtest2-reset", "-v")
     result.assert_outcomes(failed=2, passed=5, xfailed=2)
     result.stdout.fnmatch_lines(["*2 failed, 5 passed, 2 xfailed*"])
 
@@ -120,9 +120,9 @@ def test_fixture(testdir: Testdir):
     result.stdout.fnmatch_lines(["*2 failed, 5 passed, 2 xfailed*"])
 
     # just check if cmd line flags work without throwing exceptions:
-    result = testdir.runpytest("--regtest-regard-line-endings")
+    result = testdir.runpytest("--regtest2-regard-line-endings")
     result.assert_outcomes(failed=2, passed=5, xfailed=2)
 
     # just check if cmd line flags work without throwing exceptions:
-    result = testdir.runpytest("--regtest-tee")
+    result = testdir.runpytest("--regtest2-tee")
     result.assert_outcomes(failed=2, passed=5, xfailed=2)

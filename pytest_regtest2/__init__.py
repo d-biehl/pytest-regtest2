@@ -110,26 +110,26 @@ class CollectErrorRepr(TerminalRepr):
 
 def pytest_addoption(parser):
     """Add options to control the timeout plugin"""
-    group = parser.getgroup("regtest", "regression test plugin")
+    group = parser.getgroup("regtest2", "regression test plugin")
     group.addoption(
-        "--regtest-reset",
+        "--regtest2-reset",
         action="store_true",
         help="do not run regtest but record current output",
     )
     group.addoption(
-        "--regtest-tee",
+        "--regtest2-tee",
         action="store_true",
         default=False,
         help="print recorded results to console too",
     )
     group.addoption(
-        "--regtest-regard-line-endings",
+        "--regtest2-regard-line-endings",
         action="store_true",
         default=False,
         help="do not strip whitespaces at end of recorded lines",
     )
     group.addoption(
-        "--regtest-nodiff",
+        "--regtest2-nodiff",
         action="store_true",
         default=False,
         help="do not show diff output for failed regresson tests",
@@ -144,13 +144,13 @@ class Config:
 
 
 def pytest_configure(config):
-    Config.tee = config.getvalue("--regtest-tee")
-    Config.ignore_line_endings = not config.getvalue("--regtest-regard-line-endings")
-    Config.reset = config.getvalue("--regtest-reset")
-    Config.nodiff = config.getvalue("--regtest-nodiff")
+    Config.tee = config.getvalue("--regtest2-tee")
+    Config.ignore_line_endings = not config.getvalue("--regtest2-regard-line-endings")
+    Config.reset = config.getvalue("--regtest2-reset")
+    Config.nodiff = config.getvalue("--regtest2-nodiff")
 
 
-class RegTestFixture(object):
+class RegTestFixture:
     def __init__(self, request, nodeid):
         self.request = request
         self.nodeid = nodeid
